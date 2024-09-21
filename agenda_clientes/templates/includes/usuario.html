@@ -1,0 +1,58 @@
+<!-- Modal (exibe caso não esteja logado) -->
+<div class="modal fade bg-dark" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Escolha como deseja continuar</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <!-- Coluna esquerda: Continuar com uma conta -->
+            <div class="col-md-6">
+              <h6>Continuar com uma conta:</h6>
+              <a href="{% url 'login' %}" class="btn btn-primary w-100 mb-2">Login</a>
+              <a href="{% url 'signup' %}" class="btn btn-outline-primary w-100">Criar conta</a>
+            </div>
+  
+            <!-- Coluna direita: Continuar sem conta -->
+            <div class="col-md-6">
+              <h6>Continuar sem conta:</h6>
+              <form id="continue-without-account">
+                <div class="mb-3">
+                  <label for="name" class="form-label">Nome</label>
+                  <input type="text" class="form-control" id="name" placeholder="Seu nome">
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="email" placeholder="Seu email">
+                </div>
+                <button type="button" class="btn btn-success w-100" id="continue-btn">Continuar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+
+    document.getElementById('continue-btn').addEventListener('click', function() {
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+    
+        if (name && email) {
+            // Armazena os dados no sessionStorage
+            sessionStorage.setItem('name', name);
+            sessionStorage.setItem('email', email);
+    
+            // Redireciona para a página de horários
+            window.location.href = "{% url 'horarios' %}";
+        } else {
+            alert('Por favor, preencha todos os campos.');
+        }
+    });
+    
+
+</script>

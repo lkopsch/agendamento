@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block 'titulo'%} teste {% endblock %}
+
+{% block 'head'%} {% endblock %}
+
+{% block 'body'%} 
+
+<div class="container">
+    
+    <div class="row">
+
+        <div class="col-md">
+            
+            <button type="button" class="btn btn-outline-info" id="agendar-btn">Agende seu horário</button>
+        
+        </div>
+
+        {% include 'includes/usuario.html' %}
+
+    </div>
+
+</div>
+
+<script>
+
+    document.getElementById('agendar-btn').addEventListener('click', function() {
+      const userLoggedIn = "{{ user.is_authenticated }}" === "True";
+      
+      if (userLoggedIn) {
+          window.location.href = "{% url 'horarios' %}";
+      } else {
+          // Abre o modal caso o usuário não esteja logado
+          const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+          loginModal.show();
+      }
+    });
+    
+</script>
+
+{% endblock %}
+

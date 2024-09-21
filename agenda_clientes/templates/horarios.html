@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block 'titulo'%} teste {% endblock %}
+
+{% block 'head'%} {% endblock %}
+
+{% block 'body'%} 
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Horários</h2>
+
+            <button id="btnMonthView" class="btn btn-primary mb-3">Mês</button>
+            <button id="btnWeekView" class="btn btn-secondary mb-3">Semana</button>
+
+            <div id="calendar"></div>
+
+            {% include 'includes/agendar.html' %}
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+const name = sessionStorage.getItem('name');
+const email = sessionStorage.getItem('email');
+
+</script>
+
+<script type="text/javascript">
+    var isSuperuserOrStaff = false;
+
+    {% if user.is_authenticated %}
+        {% if user.is_superuser or user.is_staff %}
+            isSuperuserOrStaff = true;
+        {% endif %}
+    {% endif %}
+</script>
+
+{% endblock %}
