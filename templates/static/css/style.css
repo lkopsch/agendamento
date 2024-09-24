@@ -1,63 +1,74 @@
 /* Estilizar o calendário */
-  #calendar {
-    border-radius: 15px; /* Bordas arredondadas */
-    overflow: hidden; /* Para garantir que os cantos fiquem arredondados */
-  }
+#calendar {
+  border-radius: 15px; /* Bordas arredondadas */
+  overflow: hidden; /* Para garantir que os cantos fiquem arredondados */
+}
 
-  /* Título do mês/ano e espaçamento à esquerda */
-  .fc-toolbar-title {
-    padding-left: 10px; /* Adiciona espaçamento à esquerda do título */
-  }
+/* Estilização para as mensagens de status */
+.status-message {
+  color: white; /* Cor do texto */
+  font-weight: bold;
+  display: block; /* Permite que a mensagem ocupe sua própria linha */
+  text-align: center; /* Centraliza o texto */
+  margin-top: 5px; /* Adiciona espaço acima da mensagem */
+  font-size: 0.8rem; /* Tamanho da fonte menor para não sobrecarregar visualmente */
+}
 
-  /* Remover sublinhado dos dias */
-  .fc-daygrid-day-number, .fc-toolbar-title {
-    text-decoration: none;
-  }
+/* Título do mês/ano e espaçamento à esquerda */
+.fc-toolbar-title {
+  padding-left: 10px; /* Adiciona espaçamento à esquerda do título */
+}
 
-  /* Esquema de cores */
-  .fc .fc-toolbar {
-    background-color: #4891da; /* Fundo do cabeçalho do calendário */
-    border-bottom: 1px solid #6c757d;
-  }
+/* Remover sublinhado dos dias */
+.fc-daygrid-day-number, .fc-toolbar-title {
+  text-decoration: none;
+}
 
-  .fc .fc-col-header-cell-cushion {
-    background-color: #6c757d; /* Cor do cabeçalho dos dias da semana */
-    color: white;
-  }
+/* Esquema de cores */
+.fc .fc-toolbar {
+  background-color: #4891da; /* Fundo do cabeçalho do calendário */
+  border-bottom: 1px solid #6c757d;
+}
 
-  .fc .fc-daygrid-day {
-    background-color: #212529; /* Fundo dos dias no grid */
-    border: 1px solid #343a40; /* Borda entre os dias */
-  }
+.fc .fc-col-header-cell-cushion {
+  background-color: #6c757d; /* Cor do cabeçalho dos dias da semana */
+  color: white;
+}
 
-  .fc .fc-day-today {
-    background-color: #007bff; /* Cor do dia atual */
-    color: white;
-  }
+.fc .fc-daygrid-day {
+  background-color: #212529; /* Fundo dos dias no grid */
+  border: 1px solid #343a40; /* Borda entre os dias */
+  position: relative; /* Garante que a posição do elemento seja relativa */
+}
 
-  .fc .fc-event {
-    background-color: #17a2b8; /* Cor dos eventos */
-    border: none;
-    border-radius: 8px; /* Bordas arredondadas dos eventos */
-    color: white;
-    padding-left: 10px;
-  }
+.fc .fc-day-today {
+  background-color: #007bff; /* Cor do dia atual */
+  color: white;
+}
 
-  .fc .fc-button {
-    background-color: #6c757d; /* Botões escuros */
-    border: none;
-    color: white;
-  }
+.fc .fc-event {
+  background-color: #17a2b8; /* Cor dos eventos */
+  border: none;
+  border-radius: 8px; /* Bordas arredondadas dos eventos */
+  color: white;
+  padding-left: 10px;
+}
 
-  .fc .fc-button-primary {
-    background-color: #007bff; /* Cor do botão principal */
-  }
+.fc .fc-button {
+  background-color: #6c757d; /* Botões escuros */
+  border: none;
+  color: white;
+}
 
-  .fc .fc-button-primary:hover {
-    background-color: #0056b3;
-  }
+.fc .fc-button-primary {
+  background-color: #007bff; /* Cor do botão principal */
+}
 
-  /* Espaçamento entre os botões e o calendário */
-  .mb-3 {
-    margin-bottom: 1rem; 
-  }
+.fc .fc-button-primary:hover {
+  background-color: #0056b3;
+}
+
+/* Espaçamento entre os botões e o calendário */
+.mb-3 {
+  margin-bottom: 1rem; 
+}

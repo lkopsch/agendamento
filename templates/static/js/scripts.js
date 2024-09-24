@@ -1,41 +1,65 @@
 document.addEventListener('DOMContentLoaded', function() {
   var calendarEl = document.getElementById('calendar');
   var today = new Date();
+  today.setHours(0, 0, 0, 0); // Define a hora para 00:00:00 para comparar apenas a data
 
   var calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: 'dayGridMonth',
       height: 700,
       locale: 'pt-br',
       validRange: {
-          start: today
+          start: today // Data de início a partir de hoje
       },
-      events: function(fetchInfo, successCallback, failureCallback) {
-          fetch('/eventos/')
+
+      dayCellDidMount: function(info) {
+          var cellDate = new Date(info.date);
+          cellDate.setHours(0, 0, 0, 0);
+          var data = info.date.toISOString().split('T')[0];
+
+          if (cellDate < today) {
+              info.el.style.backgroundColor = '#ccc'; // Cor de fundo cinza para "agenda fechada"
+              info.el.style.pointerEvents = 'none'; // Impede cliques
+              info.el.innerHTML = ''; // Limpa o conteúdo anterior
+              var statusDiv = document.createElement('div');
+              statusDiv.innerText = 'Agenda Fechada';
+              statusDiv.classList.add('status-message');
+              info.el.appendChild(statusDiv);
+              return;
+          }
+
+          fetch(`/verificar_vagas/${data}/`)
               .then(response => response.json())
               .then(data => {
-                  var formattedEvents = data.map(event => {
-                      // Se o usuário não for superuser ou staff, esconde o título do evento
-                      if (!isSuperuserOrStaff) {
-                          return {
-                              ...event,
-                              title: ''  // Esconde o título
-                          };
-                      }
-                      return event;  // Mantém o evento completo
-                  });
+                  var vagasDisponiveis = data.vagas_disponiveis;
 
-                  successCallback(formattedEvents);
+                  // Define a cor de fundo baseada na disponibilidade
+                  info.el.style.backgroundColor = vagasDisponiveis ? 'green' : 'red';
+                  info.el.setAttribute('data-vagas', vagasDisponiveis);
+
+                  // Limpa o conteúdo anterior do elemento
+                  info.el.innerHTML = '';
+
+                  // Cria um div para mostrar a mensagem dentro do calendário
+                  var statusDiv = document.createElement('div');
+                  statusDiv.innerText = vagasDisponiveis ? 'Há vagas' : 'Não há vagas';
+                  statusDiv.classList.add('status-message'); // Adiciona uma classe para estilizar
+                  info.el.appendChild(statusDiv);
               })
               .catch(error => {
-                  console.error('Erro ao buscar eventos:', error);
-                  failureCallback(error);
+                  console.error("Erro ao verificar vagas:", error);
               });
       },
 
       dateClick: function(info) {
+          var vagasDisponiveis = info.dayEl.getAttribute('data-vagas') === 'true';
+
+          if (!vagasDisponiveis) {
+              alert("Não há vagas disponíveis neste dia.");
+              return;
+          }
+
           var selectedDate = info.dateStr;
           document.getElementById('selectedDate').innerText = selectedDate;
-          console.log("Data selecionada:", selectedDate);
 
           var timeButtons = document.querySelectorAll('#timeButtons button');
           timeButtons.forEach(function(button) {
@@ -48,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
               .then(data => {
                   if (data.length > 0) {
                       data.forEach(event => {
-                          var formattedTime = event.start_time.substring(0, 5);  // Pega apenas HH:MM
+                          var formattedTime = event.start_time.substring(0, 5);
                           var buttonToDisable = document.querySelector(`button[data-time="${formattedTime}"]`);
                           if (buttonToDisable) {
                               buttonToDisable.classList.add('disabled');
@@ -75,6 +99,8 @@ document.addEventListener('DOMContentLoaded', function() {
       calendar.changeView('timeGridWeek');
   });
 });
+
+
 
 
 // Adiciona o evento de clique aos botões de horário

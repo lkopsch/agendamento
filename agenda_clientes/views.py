@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from .models import *
 import json
 
@@ -139,3 +139,22 @@ def eventos_crus(request):
         })
 
     return JsonResponse(eventos_list, safe=False)
+
+def verificar_vagas_view(request, dia):
+    # Converte a string da URL para um objeto date
+    data = date.fromisoformat(dia)
+    
+    # Conta o número de agendamentos no dia
+    agendamentos_no_dia = Eventos.objects.filter(date=data).count()
+    
+    # Chama o método verificar_vagas para a data fornecida
+    status_vagas = Eventos.verificar_vagas(data)
+    
+    vagas_disponiveis = status_vagas == "Há vagas"
+    
+    # Retorna um JSON com a informação de vagas e a quantidade de agendamentos
+    return JsonResponse({
+        'vagas_disponiveis': vagas_disponiveis,
+        'status_vagas': status_vagas,
+        'agendamentos_no_dia': agendamentos_no_dia
+    })

@@ -18,3 +18,13 @@ class Eventos(models.Model):
 
     def __str__(self):
         return self.title
+    
+    @staticmethod
+    def verificar_vagas(date):
+        # Conta quantos agendamentos existem para a data fornecida
+        agendamentos_no_dia = Eventos.objects.filter(date=date).count()
+        # Se tiver 8 ou mais agendamentos, não há vagas
+        if agendamentos_no_dia >= 8:
+            return "Não há mais vagas"
+        else:
+            return "Há vagas"
