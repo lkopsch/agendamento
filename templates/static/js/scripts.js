@@ -4,101 +4,126 @@ document.addEventListener('DOMContentLoaded', function() {
   today.setHours(0, 0, 0, 0); // Define a hora para 00:00:00 para comparar apenas a data
 
   var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      height: 700,
-      locale: 'pt-br',
-      validRange: {
-          start: today // Data de início a partir de hoje
-      },
+    initialView: 'dayGridMonth',
+    height: 700,
+    locale: 'pt-br',
 
-      dayCellDidMount: function(info) {
-          var cellDate = new Date(info.date);
-          cellDate.setHours(0, 0, 0, 0);
-          var data = info.date.toISOString().split('T')[0];
+    events: function(fetchInfo, successCallback, failureCallback) {
+      var events = [];
+      var requests = [];
 
-          if (cellDate < today) {
-              info.el.style.backgroundColor = '#ccc'; // Cor de fundo cinza para "agenda fechada"
-              info.el.style.pointerEvents = 'none'; // Impede cliques
-              info.el.innerHTML = ''; // Limpa o conteúdo anterior
-              var statusDiv = document.createElement('div');
-              statusDiv.innerText = 'Agenda Fechada';
-              statusDiv.classList.add('status-message');
-              info.el.appendChild(statusDiv);
-              return;
-          }
+      // Loop através de cada dia no intervalo exibido no calendário
+      var currentDate = new Date(fetchInfo.start);
+      currentDate.setHours(0, 0, 0, 0);
 
-          fetch(`/verificar_vagas/${data}/`)
+      while (currentDate <= fetchInfo.end) {
+        (function(date) {
+          var formattedDate = date.toISOString().split('T')[0];
+
+          if (date < today) {
+            // Adicionar evento de "Agenda Fechada" para dias passados
+            events.push({
+              title: 'Agenda Fechada',
+              start: formattedDate,
+              allDay: true,
+              backgroundColor: '#b07b61',
+              textColor: '#fff'
+            });
+          } else {
+            // Requisição para verificar vagas em dias futuros
+            let request = fetch(`/verificar_vagas/${formattedDate}/`)
               .then(response => response.json())
               .then(data => {
-                  var vagasDisponiveis = data.vagas_disponiveis;
-
-                  // Define a cor de fundo baseada na disponibilidade
-                  info.el.style.backgroundColor = vagasDisponiveis ? 'green' : 'red';
-                  info.el.setAttribute('data-vagas', vagasDisponiveis);
-
-                  // Limpa o conteúdo anterior do elemento
-                  info.el.innerHTML = '';
-
-                  // Cria um div para mostrar a mensagem dentro do calendário
-                  var statusDiv = document.createElement('div');
-                  statusDiv.innerText = vagasDisponiveis ? 'Há vagas' : 'Não há vagas';
-                  statusDiv.classList.add('status-message'); // Adiciona uma classe para estilizar
-                  info.el.appendChild(statusDiv);
+                var vagasDisponiveis = data.vagas_disponiveis;
+                events.push({
+                  title: vagasDisponiveis ? 'Há vagas' : 'Não há mais vagas',
+                  start: formattedDate,
+                  allDay: true,
+                  backgroundColor: vagasDisponiveis ? 'green' : 'red',
+                  textColor: '#fff'
+                });
               })
               .catch(error => {
-                  console.error("Erro ao verificar vagas:", error);
+                console.error('Erro ao verificar vagas:', error);
               });
-      },
 
-      dateClick: function(info) {
-          var vagasDisponiveis = info.dayEl.getAttribute('data-vagas') === 'true';
-
-          if (!vagasDisponiveis) {
-              alert("Não há vagas disponíveis neste dia.");
-              return;
+            requests.push(request); // Adiciona a promessa de requisição
           }
+        })(new Date(currentDate)); // Captura o valor da data atual no loop
 
-          var selectedDate = info.dateStr;
-          document.getElementById('selectedDate').innerText = selectedDate;
+        currentDate.setDate(currentDate.getDate() + 1); // Próximo dia
+      }
 
-          var timeButtons = document.querySelectorAll('#timeButtons button');
-          timeButtons.forEach(function(button) {
+      // Quando todas as requisições estiverem completas
+      Promise.all(requests).then(() => {
+        successCallback(events); // Renderiza os eventos no calendário
+      }).catch(failureCallback);
+    },
+
+    dateClick: function(info) {
+      var selectedDate = info.dateStr;
+      var eventTitle = info.dayEl.querySelector('.fc-event-title'); // Obtém o título do evento
+
+      // Verifica se o dia é marcado como "Agenda Fechada"
+      if (eventTitle && eventTitle.innerText === "Agenda Fechada") {
+        alert("Este dia está fechado para agendamento.");
+        return; // Impede ações para dias com "Agenda Fechada"
+      }
+
+      // Solicitação para verificar vagas na data clicada
+      fetch(`/verificar_vagas/${selectedDate}/`)
+        .then(response => response.json())
+        .then(data => {
+          if (!data.vagas_disponiveis) {
+            alert("Não há vagas disponíveis neste dia.");
+          } else {
+            document.getElementById('selectedDate').innerText = selectedDate;
+
+            // Manipula os botões de horário para a data selecionada
+            var timeButtons = document.querySelectorAll('#timeButtons button');
+            timeButtons.forEach(function(button) {
               button.classList.remove('disabled');
               button.setAttribute('data-date', selectedDate);
-          });
+            });
 
-          fetch(`/eventos-crus/?date=${selectedDate}`)
+            fetch(`/eventos-crus/?date=${selectedDate}`)
               .then(response => response.json())
               .then(data => {
-                  if (data.length > 0) {
-                      data.forEach(event => {
-                          var formattedTime = event.start_time.substring(0, 5);
-                          var buttonToDisable = document.querySelector(`button[data-time="${formattedTime}"]`);
-                          if (buttonToDisable) {
-                              buttonToDisable.classList.add('disabled');
-                          }
-                      });
-                  }
+                if (data.length > 0) {
+                  data.forEach(event => {
+                    var formattedTime = event.start_time.substring(0, 5);
+                    var buttonToDisable = document.querySelector(`button[data-time="${formattedTime}"]`);
+                    if (buttonToDisable) {
+                      buttonToDisable.classList.add('disabled');
+                    }
+                  });
+                }
               })
               .catch(error => {
-                  console.error('Erro ao buscar eventos:', error);
+                console.error('Erro ao buscar eventos:', error);
               });
 
-          var modal = new bootstrap.Modal(document.getElementById('dateModal'));
-          modal.show();
-      }
+            var modal = new bootstrap.Modal(document.getElementById('dateModal'));
+            modal.show();
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao verificar vagas:', error);
+        });
+    }
   });
 
   calendar.render();
 
   document.getElementById('btnMonthView').addEventListener('click', function() {
-      calendar.changeView('dayGridMonth');
+    calendar.changeView('dayGridMonth');
   });
 
   document.getElementById('btnWeekView').addEventListener('click', function() {
-      calendar.changeView('timeGridWeek');
+    calendar.changeView('timeGridWeek');
   });
 });
+
 
 
 
