@@ -123,3 +123,15 @@ a {
   outline: none !important; /* Remove o contorno de foco */
   box-shadow: none !important; /* Remove qualquer sombra */
 }
+
+.custom-dropdown {
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Borda clara */
+}
+
+.custom-dropdown .dropdown-item {
+  color: white; /* Texto branco */
+}
+
+.custom-dropdown .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Fundo mais claro ao passar o mouse */
+}

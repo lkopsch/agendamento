@@ -122,7 +122,6 @@ def criar_evento(request):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
-
 def eventos_crus(request):
     date = request.GET.get('date')  # Pega a data da query string
     if date:
@@ -159,3 +158,6 @@ def verificar_vagas_view(request, dia):
         'status_vagas': status_vagas,
         'agendamentos_no_dia': agendamentos_no_dia
     })
+
+def configuracoes(request):
+    return render(request, 'configuracoes.html')

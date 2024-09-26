@@ -12,8 +12,18 @@
         </ul>
         <ul class="navbar-nav ms-auto">
           {% if user.is_authenticated %}
-          <li class="nav-item">
-            <button type="button" class="btn btn-outline-info"><a>Minha Conta</a></button>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Minha Conta
+            </a>
+            <ul class="dropdown-menu bg-dark custom-dropdown">
+              <li><a class="dropdown-item text-white" href="#">Meus agendamentos</a></li>
+              <li><a class="dropdown-item text-white" href="#">Programa de fidelidade</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-white" href="{% url 'configuracoes' %}">Configurações</a></li>
+          </ul>
+          
           </li>
           <li class="nav-item ms-2">
             <a class="nav-link" href="{% url 'logout' %}">Logout</a>

@@ -11,4 +11,5 @@ urlpatterns = [
     path('criar-evento/', criar_evento, name='criar_evento'),
     path('eventos-crus/', eventos_crus, name='eventos_crus'),
     path('verificar_vagas/<str:dia>/', verificar_vagas_view, name='verificar_vagas'),
+    path('configuracoes/', configuracoes, name='configuracoes')
 ]
