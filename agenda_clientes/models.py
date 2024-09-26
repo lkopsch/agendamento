@@ -10,6 +10,8 @@ class Eventos(models.Model):
     name = models.CharField(max_length=30,null=True, blank=True)
     fone = models.CharField(max_length=15,null=True, blank=True)
     email = models.CharField(max_length=60,null=True, blank=True)
+    id_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, db_column='id_user')
+
 
     def save(self, *args, **kwargs):
         # Se 'end' não for fornecido, calcula o fim como 1 hora após o início

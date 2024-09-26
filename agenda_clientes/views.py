@@ -59,6 +59,7 @@ def get_eventos(request):
         # Combina a data e o tempo de início e fim para formar os valores de datetime
         start_datetime = datetime.combine(evento.date, evento.start_time).isoformat()
         end_datetime = None
+        id_user = id_user
         if evento.end_time:
             end_datetime = datetime.combine(evento.date, evento.end_time).isoformat()
 
@@ -67,7 +68,7 @@ def get_eventos(request):
             'title': evento.title,
             'start': start_datetime,
             'end': end_datetime,
-            'allDay': False 
+            'id_user' : id_user
         })
 
     # Retorna os eventos como JSON
@@ -81,15 +82,16 @@ def criar_evento(request):
 
             # Captura os dados do evento
             title = data.get('title')
-            start = data.get('start')  # Isso incluirá a data e o horário de início no formato ISO
+            start = data.get('start')
 
             # Se o usuário estiver logado, obtém o id, nome e email da sessão autenticada
             if request.user.is_authenticated:
-                name = user.first_name or user.username  # Pega o nome do usuário logado (first_name ou username)
-                email = user.email  # Pega o email do usuário logado
+                id_user = request.user.id
+                name = request.user.first_name or request.user.username
+                email = request.user.email
             else:
                 # Caso contrário, pega os dados enviados do frontend
-                user = None  # Usuário não autenticado
+                id_user = None  # Usuário não autenticado
                 name = data.get('name')
                 email = data.get('email')
 
@@ -98,7 +100,7 @@ def criar_evento(request):
                 return JsonResponse({'status': 'error', 'message': 'Dados insuficientes'}, status=400)
 
             # Converte a string ISO de início para os campos de data e hora
-            start_datetime = datetime.fromisoformat(start)  # ISO format (yyyy-mm-ddThh:mm:ss)
+            start_datetime = datetime.fromisoformat(start)
             date = start_datetime.date()
             start_time = start_datetime.time()
 
@@ -113,11 +115,13 @@ def criar_evento(request):
                 end_time=end_time,
                 name=name,
                 email=email,
+                id_user_id=id_user  # Use id_user_id para FK
             )
             return JsonResponse({'status': 'success', 'evento_id': evento.id})
 
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
 
 def eventos_crus(request):
     date = request.GET.get('date')  # Pega a data da query string
