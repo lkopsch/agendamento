@@ -82,14 +82,14 @@ def criar_evento(request):
             # Captura os dados do evento
             title = data.get('title')
             start = data.get('start')  # Isso incluirá a data e o horário de início no formato ISO
-            all_day = data.get('allDay', False)
 
-            # Se o usuário estiver logado, obtém o nome e email da sessão autenticada
+            # Se o usuário estiver logado, obtém o id, nome e email da sessão autenticada
             if request.user.is_authenticated:
-                name = request.user.first_name or request.user.username  # Pega o nome do usuário logado (first_name ou username)
-                email = request.user.email  # Pega o email do usuário logado
+                name = user.first_name or user.username  # Pega o nome do usuário logado (first_name ou username)
+                email = user.email  # Pega o email do usuário logado
             else:
                 # Caso contrário, pega os dados enviados do frontend
+                user = None  # Usuário não autenticado
                 name = data.get('name')
                 email = data.get('email')
 
@@ -111,16 +111,13 @@ def criar_evento(request):
                 date=date,
                 start_time=start_time,
                 end_time=end_time,
-                name=name,   
-                email=email  
+                name=name,
+                email=email,
             )
             return JsonResponse({'status': 'success', 'evento_id': evento.id})
 
         except Exception as e:
-            print("Erro:", str(e))  # Logando o erro
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
-    return JsonResponse({'status': 'error', 'message': 'Método não permitido'}, status=405)
 
 def eventos_crus(request):
     date = request.GET.get('date')  # Pega a data da query string

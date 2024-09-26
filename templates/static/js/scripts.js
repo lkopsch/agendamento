@@ -62,13 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     dateClick: function(info) {
       var selectedDate = info.dateStr;
-      var eventTitle = info.dayEl.querySelector('.fc-event-title'); // Obtém o título do evento
-
-      // Verifica se o dia é marcado como "Agenda Fechada"
-      if (eventTitle && eventTitle.innerText === "Agenda Fechada") {
-        alert("Este dia está fechado para agendamento.");
-        return; // Impede ações para dias com "Agenda Fechada"
-      }
 
       // Solicitação para verificar vagas na data clicada
       fetch(`/verificar_vagas/${selectedDate}/`)
@@ -86,8 +79,14 @@ document.addEventListener('DOMContentLoaded', function() {
               button.setAttribute('data-date', selectedDate);
             });
 
+            // Desabilita horários já ocupados
             fetch(`/eventos-crus/?date=${selectedDate}`)
-              .then(response => response.json())
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Erro ao buscar eventos: ' + response.status);
+                }
+                return response.json();  // Tenta converter a resposta para JSON
+              })
               .then(data => {
                 if (data.length > 0) {
                   data.forEach(event => {
@@ -115,6 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   calendar.render();
 
+  // Alternar entre visualizações de mês e semana
   document.getElementById('btnMonthView').addEventListener('click', function() {
     calendar.changeView('dayGridMonth');
   });
@@ -122,7 +122,46 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btnWeekView').addEventListener('click', function() {
     calendar.changeView('timeGridWeek');
   });
+
+  // Adiciona evento de clique nos botões de horário
+  var timeButtons = document.querySelectorAll('#timeButtons button');
+  timeButtons.forEach(function(button) {
+    button.addEventListener('click', function() {
+      if (!button.classList.contains('disabled')) {
+        var selectedTime = button.getAttribute('data-time');
+        var selectedDate = button.getAttribute('data-date');
+
+        // Cria o evento no banco de dados
+        fetch('/criar_evento/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: JSON.stringify({
+            title: 'Novo Agendamento',
+            start: `${selectedDate}T${selectedTime}`,
+            name: 'Nome do Usuário',
+            email: 'email@exemplo.com'
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            alert('Horário agendado com sucesso!');
+            button.classList.add('disabled'); // Desabilita o botão após o agendamento
+          } else {
+            alert('Erro ao agendar o horário.');
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao criar evento:', error);
+        });
+      }
+    });
+  });
 });
+
 
 
 
