@@ -18,8 +18,8 @@
               Minha Conta
             </a>
             <ul class="dropdown-menu bg-dark custom-dropdown">
-              <li><a class="dropdown-item text-white" href="#">Meus agendamentos</a></li>
-              <li><a class="dropdown-item text-white" href="#">Programa de fidelidade</a></li>
+              <li><a class="dropdown-item text-white" href="{% url 'agendamentos' %}">Meus agendamentos</a></li>
+              <li><a class="dropdown-item text-white" href="{% url 'fidelidade' %}">Programa de fidelidade</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item text-white" href="{% url 'configuracoes' %}">Configurações</a></li>
           </ul>

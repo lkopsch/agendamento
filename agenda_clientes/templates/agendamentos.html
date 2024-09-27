@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block titulo %} teste {% endblock %}
+{% block head %} {% endblock %}
+{% block body %}
+
+<div class="container">
+    <table class="table table-dark">
+        <thead>
+            <tr>
+                <th scope="col">Titulo</th>
+                <th scope="col">Data</th>
+                <th scope="col">Hora</th>
+                <th scope="col">Email</th>
+                <th scope="col">Nome</th>
+                <th scope="col">Id user</th>
+                <th scope="col">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for agendamento in agendamentos %}
+            <tr>
+                <td>{{ agendamento.title }}</td>
+                <td>{{ agendamento.date }}</td>
+                <td>{{ agendamento.start_time }}</td>
+                <td>{{ agendamento.mail }}</td>
+                <td>{{ agendamento.name }}</td>
+                <td>{{ agendamento.id_user }}</td>
+                <td>
+                    <!-- Formulário para excluir o agendamento -->
+                    <form action="{% url 'excluir_agendamento' agendamento.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">Não há agendamentos disponíveis.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+    
+{% endblock %}
+
+

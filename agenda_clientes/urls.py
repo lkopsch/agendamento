@@ -11,5 +11,8 @@ urlpatterns = [
     path('criar-evento/', criar_evento, name='criar_evento'),
     path('eventos-crus/', eventos_crus, name='eventos_crus'),
     path('verificar_vagas/<str:dia>/', verificar_vagas_view, name='verificar_vagas'),
-    path('configuracoes/', configuracoes, name='configuracoes')
+    path('configuracoes/', configuracoes, name='configuracoes'),
+    path('fidelidade/', fidelidade, name='fidelidade'),
+    path('agendamentos/', agendamentos, name='agendamentos'),
+    path('agendamentos/excluir/<int:id>/', excluir_agendamento, name='excluir_agendamento')
 ]

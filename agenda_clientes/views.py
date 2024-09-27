@@ -2,7 +2,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta, date
 from .models import *
 import json
@@ -161,3 +162,32 @@ def verificar_vagas_view(request, dia):
 
 def configuracoes(request):
     return render(request, 'configuracoes.html')
+
+def fidelidade(request):
+    return render(request, 'fidelidade.html')
+
+def agendamentos(request):
+
+    eventos = Eventos.objects.filter(id_user=request.user)
+
+    agendamentos = []
+    for evento in eventos:
+        agendamentos.append({
+            'id': evento.id,
+            'title': evento.title,
+            'date': evento.date,
+            'start_time': evento.start_time,
+            'mail': evento.email,
+            'id_user': evento.id_user,
+            'name': evento.name
+        })
+
+    context = {'agendamentos': agendamentos}
+
+    return render(request, 'agendamentos.html', context)
+
+@login_required
+def excluir_agendamento(request, id):
+    evento = get_object_or_404(Eventos, id=id, id_user=request.user)
+    evento.delete()
+    return redirect('agendamentos')
